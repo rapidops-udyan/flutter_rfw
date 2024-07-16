@@ -25,7 +25,6 @@ class _RemoteUiState extends State<RemoteUi> {
   RemoteWidgetLibrary? _remoteWidgetLibrary;
   final ValueNotifier<bool> _isReady = ValueNotifier(false);
   final _api = API();
-  final ValueNotifier<String> _imageBase64 = ValueNotifier('');
 
   @override
   void initState() {
@@ -39,7 +38,6 @@ class _RemoteUiState extends State<RemoteUi> {
   void dispose() {
     _runtime.dispose();
     _isReady.dispose();
-    _imageBase64.dispose(); // Dispose _imageBase64
     super.dispose();
   }
 
@@ -94,7 +92,7 @@ class _RemoteUiState extends State<RemoteUi> {
             ),
         'CustomFAB': (BuildContext context, DataSource source) =>
             FloatingActionButton(
-              onPressed: source.voidHandler(['find']),
+              onPressed: source.voidHandler(['onPressed']),
               backgroundColor:
                   ArgumentDecoders.color(source, ['backgroundColor']),
               child: const Icon(
@@ -104,22 +102,14 @@ class _RemoteUiState extends State<RemoteUi> {
             ),
         'Logo': (BuildContext context, DataSource source) {
           final imageBase64 = source.v<String>(['image']) ?? '';
-          _imageBase64.value = imageBase64;
           return Expanded(
             child: Container(
               margin: ArgumentDecoders.edgeInsets(source, ['margin']),
-              child: ValueListenableBuilder<String>(
-                valueListenable: _imageBase64,
-                builder: (context, image, _) {
-                  if (image.isNotEmpty) {
-                    return Image.memory(base64Decode(image));
-                  } else {
-                    return const Image(
+              child: imageBase64.isNotEmpty
+                  ? Image.memory(base64Decode(imageBase64))
+                  : const Image(
                       image: AssetImage('assets/default.png'),
-                    );
-                  }
-                },
-              ),
+                    ),
             ),
           );
         },
@@ -139,11 +129,9 @@ class _RemoteUiState extends State<RemoteUi> {
                 data: _dynamicContent,
                 onEvent: (String name, DynamicMap arguments) async {
                   if (name == 'find') {
-                    final url = arguments['url'].toString();
-                    print(url);
-                    final data = await _api.fetchImage(url);
+                    final data =
+                        await _api.fetchImage(arguments['url'].toString());
                     final base64Image = base64Encode(data);
-                    _imageBase64.value = base64Image;
                     _updateData('image', base64Image);
                   }
                 },
