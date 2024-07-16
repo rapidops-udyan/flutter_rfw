@@ -14,20 +14,18 @@ class _RemoteUiState extends State<RemoteUi> {
   late final Runtime _runtime;
   final DynamicContent _dynamicContent = DynamicContent();
   final CollectionReference _data =
-      FirebaseFirestore.instance.collection('counter_app');
+      FirebaseFirestore.instance.collection('config');
   final LibraryName mainName = const LibraryName(<String>['main']);
-  RemoteWidgetLibrary? _remoteWidgetLibrary; // Remove 'late' keyword here
-  int _counter = 0;
+  final LibraryName localName = const LibraryName(<String>['local']);
+  RemoteWidgetLibrary? _remoteWidgetLibrary;
+  bool _isReady = false;
 
   @override
   void initState() {
-    _runtime = Runtime();
-    _runtime.update(
-        const LibraryName(<String>['core', 'widgets']), createCoreWidgets());
-    _runtime.update(const LibraryName(<String>['core', 'material']),
-        createMaterialWidgets());
-    _fetchData();
     super.initState();
+    _runtime = Runtime();
+    _initializeRuntime();
+    _fetchData();
   }
 
   @override
@@ -36,38 +34,68 @@ class _RemoteUiState extends State<RemoteUi> {
     super.dispose();
   }
 
-  Future<void> _fetchData() async {
-    await _data.get().then((QuerySnapshot snapshot) {
-      final value = snapshot.docs.first.get('main');
-      setState(() {
-        _remoteWidgetLibrary = parseLibraryFile(value.toString());
-      });
-      if (_remoteWidgetLibrary != null) {
-        _runtime.update(mainName, _remoteWidgetLibrary!);
-        _dynamicContent.update('counter', _counter.toString());
-      }
-    });
+  void _initializeRuntime() {
+    _runtime.update(localName, _createLocalWidgets());
+    _runtime.update(
+      const LibraryName(<String>['core', 'widgets']),
+      createCoreWidgets(),
+    );
+    _runtime.update(
+      const LibraryName(<String>['core', 'material']),
+      createMaterialWidgets(),
+    );
   }
 
-  void _updateData() {
-    _dynamicContent.update('counter', _counter.toString());
+  Future<void> _fetchData() async {
+    try {
+      final snapshot = await _data.doc('ui').get();
+      if (snapshot.exists) {
+        final value = snapshot.get('root');
+        if (value != null && value is String) {
+          _remoteWidgetLibrary = parseLibraryFile(value);
+          if (_remoteWidgetLibrary != null) {
+            _runtime.update(mainName, _remoteWidgetLibrary!);
+            setState(() {
+              _isReady = true;
+            });
+          }
+        }
+      }
+    } catch (e) {
+      // Handle errors appropriately in a real application
+    }
+  }
+
+  static WidgetLibrary _createLocalWidgets() {
+    return LocalWidgetLibrary(
+      <String, LocalWidgetBuilder>{
+        'CustomIcon': (BuildContext context, DataSource source) {
+          return const Icon(Icons.flutter_dash_rounded);
+        },
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return _remoteWidgetLibrary == null
-        ? const Center(child: CircularProgressIndicator())
+    return !_isReady
+        ? const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
         : RemoteWidget(
             runtime: _runtime,
-            widget: const FullyQualifiedWidgetName(
-                LibraryName(['main']), 'Counter'),
+            widget:
+                const FullyQualifiedWidgetName(LibraryName(['main']), 'root'),
             data: _dynamicContent,
             onEvent: (eventName, eventArguments) {
-              if (eventName == 'increment') {
-                setState(() {
-                  _counter++;
-                  _updateData();
-                });
+              if (eventName == 'showSnackBar') {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Remote Flutter Widgets'),
+                  ),
+                );
               }
             },
           );

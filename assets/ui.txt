@@ -1,0 +1,52 @@
+import core.widgets;
+import core.material;
+import local;
+
+widget root = Scaffold(
+   backgroundColor: 0XFFFFFFFF,
+   appBar: AppBar(
+        title: Text(text: "Remote Flutter Widget"),
+        centerTitle: true,
+   ),
+   body: Column(
+     children: [
+       Text(
+           text: "Widgets Demo",
+           style: {
+             fontSize: 24,
+             fontWeight: "bold",
+           },
+        ),
+       Expanded(
+         child: ListView(
+           children: [
+             ListTile(
+               title: Text(text: "ListTile"),
+               subtitle: Text(text: "Subtitle"),
+               trailing:Text(text: "Trailing") ,
+             ),
+             Row(
+               mainAxisAlignment: "spaceEvenly",
+               children: [
+                 Text(text: "Item 1"),
+                 Text(text: "Item 2"),
+                 Text(text: "Item 3"),
+               ],
+             ),
+             Column(
+               children: [
+                 Text(text: "Item 1"),
+                 Text(text: "Item 2"),
+                 Text(text: "Item 3"),
+               ],
+             ),
+           ],
+         ),
+       ),
+     ],
+   ),
+   floatingActionButton: FloatingActionButton(
+       onPressed: event "showSnackBar" {},
+       child: CustomIcon(),
+   ),
+);
