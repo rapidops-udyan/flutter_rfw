@@ -1,0 +1,28 @@
+import core.widgets;
+import core.material;
+import local;
+
+widget root = Scaffold(
+   backgroundColor:0XFF042B59,
+   appBar: AppBar(
+        title: Text(text: "Logo Finder",style:{color:0XFFFFFFFF,},),
+        centerTitle: true,
+        backgroundColor:0XFF042B59,
+   ),
+   body: Column(
+     children: [
+       Text(text:data.url,style:{color:0XFFFFFFFF,},),
+       Logo(margin:[24.0,24.0],image:data.image,),
+       Padding(
+         padding: [ 24.0,0.0,80.0,16.0,],
+         child:CustomTextField(
+            radius:12.0,
+            filled:true,
+            fillColor:0XFF027DFD,
+            hintText:"Enter URL",
+        ),
+       ),
+     ],
+   ),
+   floatingActionButton: CustomFAB(onPressed: event "find" { "url": data.url },backgroundColor:0XFF027DFD,),
+);

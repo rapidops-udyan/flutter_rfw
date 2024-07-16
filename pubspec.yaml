@@ -38,6 +38,7 @@ dependencies:
   rfw: ^1.0.29
   firebase_core: ^3.2.0
   cloud_firestore: ^5.1.0
+  dio: ^5.5.0+1
 
 dev_dependencies:
   flutter_test:
