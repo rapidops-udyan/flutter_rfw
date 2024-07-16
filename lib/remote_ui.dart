@@ -102,15 +102,13 @@ class _RemoteUiState extends State<RemoteUi> {
             ),
         'Logo': (BuildContext context, DataSource source) {
           final imageBase64 = source.v<String>(['image']) ?? '';
-          return Expanded(
-            child: Container(
-              margin: ArgumentDecoders.edgeInsets(source, ['margin']),
-              child: imageBase64.isNotEmpty
-                  ? Image.memory(base64Decode(imageBase64))
-                  : const Image(
-                      image: AssetImage('assets/default.png'),
-                    ),
-            ),
+          return Container(
+            margin: ArgumentDecoders.edgeInsets(source, ['margin']),
+            child: imageBase64.isNotEmpty
+                ? Image.memory(base64Decode(imageBase64))
+                : const Image(
+                    image: AssetImage('assets/default.png'),
+                  ),
           );
         },
       },
@@ -136,7 +134,9 @@ class _RemoteUiState extends State<RemoteUi> {
                   }
                 },
               )
-            : const Scaffold(body: Center(child: CircularProgressIndicator()));
+            : const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
       },
     );
   }

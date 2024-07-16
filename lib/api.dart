@@ -3,7 +3,7 @@ import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 
 class API {
   final Dio _dio = Dio();
-  final String _defaultImagePath = 'assets/error.png';
+  final String _defaultImagePath = 'assets/default.png';
 
   Future<Uint8List> fetchImage(String url) async {
     final String requestUrl = 'https://logo.clearbit.com/$url';

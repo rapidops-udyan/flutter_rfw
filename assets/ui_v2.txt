@@ -4,6 +4,7 @@ import local;
 
 widget root = Scaffold(
   backgroundColor: 0xFF042B59,
+  resizeToAvoidBottomInset: false,
   appBar: AppBar(
     title: Text(
       text: "Logo Finder",
@@ -16,18 +17,8 @@ widget root = Scaffold(
   ),
   body: Column(
     children: [
-      Text(
-        text: data.url,
-        style: {
-          color: 0xFFFFFFFF,
-        },
-      ),
-      Logo(
-        margin: [24.0, 24.0],
-        image: data.image,
-      ),
       Padding(
-        padding: [24.0, 0.0, 80.0, 16.0],
+        padding: [24.0, 0.0, 24.0, 0.0],
         child: CustomTextField(
           radius: 12.0,
           filled: true,
@@ -35,10 +26,20 @@ widget root = Scaffold(
           hintText: "Enter URL",
         ),
       ),
+      Logo(
+        margin: [24.0, 24.0],
+        image: data.image,
+      ),
+      Text(
+        text: data.url,
+        style: {
+          color: 0xFFFFFFFF,
+        },
+      ),
     ],
   ),
   floatingActionButton: CustomFAB(
-    onPressed: event "find" { 'url':data.url },
+    onPressed: event "find" {'url': data.url},
     backgroundColor: 0xFF027DFD,
   ),
 );
